@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+
+#        neofetch --source $(echo ${art[$(shuf -i 0-${#art[@]} -n 1)]}) # BROKEN
+
+function ascii-logo() {
+    if [ "X" != "X$(which neofetch 2>/dev/null)" ]
+    then
+        local img=""
+        # art is an array of ascii art files
+        local art=( $(find ~/ascii-art/ -name "*.txt" -type f 2>/dev/null | sort -u) )
+        # idx is a random index within that array
+        local idx=$(shuf -i 0-${#art[@]} -n 1)
+        # img is the contents of that indexed filename in art
+        if [ "X" == "X${art[${idx}]}" ] || [ "X1" == "X$(shuf -i 0-2 -n 1)" ]
+        then
+            img="$( fortune | cowsay | lolcat )"
+        else
+            img="$(cat ${art[${idx}]})"
+        fi
+        # output the text
+        neofetch --ascii "${img}"
+    else
+        # output the text, if screenfetch is a thing on this system
+        [ "X" != "X$(which screenfetch 2>/dev/null)" ] && screenfetch
+    fi
+}
+
+# execute
+ascii-logo

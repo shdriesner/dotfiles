@@ -1,0 +1,56 @@
+# this file updates PS1 via the PROMPT_COMMAND environment variable.
+# to use, save this file to ${HOME} and add the following line to the end
+# of your ${HOME}/.bashrc (remove the leading '# ', i.e. '#' sign and following space):
+#
+# [ -e ${HOME}/.promptrc ] && . ${HOME}/.promptrc
+#
+
+# define some colors to make each element in the prompt distinct
+RED='\[\033[0;31m\]'  # RED
+GRN='\[\033[0;32m\]'  # GReeN
+YLW='\[\033[0;33m\]'  # YeLloW
+LBL='\[\033[0;36m\]'  # Light BLue
+#MAG='\[\033[1;35m\]'  # MAGenta (bold)
+MAG='\[\033[0;35m\]'  # MAGenta (normal)
+NC='\[\033[0m\]'      # No Color
+
+# function to get the top level root directory of the current repo
+function get-git-toplevel() {
+    git rev-parse --show-toplevel 2>/dev/null
+}
+
+# function to get the current branch
+function get-git-current-branch() {
+    git rev-parse --abbrev-ref HEAD 2>/dev/null
+}
+
+# function to get the current HEAD commit ID, limited to 6 characters
+function get-git-current-head-id() {
+    git rev-parse --short=6 HEAD 2>/dev/null
+}
+
+# function to use 'git describe' to get the closest previous tag
+function get-git-closest-tag() {
+    git describe HEAD 2>/dev/null
+}
+
+# if you are actually in a git repo,
+# this will output a string, enclosed in carats '<>'
+# with the branch in yellow and the shortened commit id in red,
+# otherwise it will do nothing.
+function get-git-branch-and-id() {
+    local br="$(get-git-current-branch)"
+    if [ "X" != "X${br}" ]
+    then
+        [ "XHEAD" == "X${br}" ] && br="$(get-git-closest-tag)"
+   	echo -e " <${YLW}${br}${NC}, ${RED}$(get-git-current-head-id)${NC}>"
+    fi
+}
+
+# this updates PS1
+function assemble-prompt() {
+         export PS1="${LBL}[${NC}${GRN}\u${NC}@${YLW}\h${NC} ${MAG}\w${NC}${LBL}]${NC}$(get-git-branch-and-id)${NC} \$ "
+}
+
+# PROMPT_COMMAND executes on every new prompt.
+export PROMPT_COMMAND=assemble-prompt

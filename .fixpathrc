@@ -1,0 +1,22 @@
+# this function is intended to fix an existing path by eliminating duplicate paths for better performance.
+
+function path-remove-dups() {
+    local s="|"$( echo ${PATH} | sed -e 's/:/\n/g' | sort -u | xargs -r echo -n | sed -e 's- /-|/-g' )"|"
+    local p=""
+    for x in $( echo "${PATH}" | sed -e 's/:/\n/g' )
+    do
+        # this will eliminate empty paths
+        [ "X" == "X${x}" ] && continue
+        # this creates a new string 'n' which has the current path
+        # stripped out
+        local n=$(echo "${s}" | sed -e "s:\([|]\)${x}[|]:\1:g")
+        # if the new string does not match the current saved string
+        # then add the current directory path to the new path
+        # and assign the new string to the saved string
+        [ "X${n}" != "X${s}" ] && { p="${p}:${x}"; s="${n}"; }
+    done
+    export PATH="$(echo "${p}" | sed -e 's/^://')"
+}
+
+# now, execute it
+path-remove-dups
