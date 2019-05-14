@@ -31,7 +31,7 @@ function get-git-current-head-id() {
 
 # function to use 'git describe' to get the closest previous tag
 function get-git-closest-tag() {
-    git describe HEAD 2>/dev/null
+    git describe --tags HEAD 2>/dev/null
 }
 
 # if you are actually in a git repo,
